@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+  - instaceId.yaml
+  tasks:
+
+    - name: print module name one by one
+      debug:
+        msg: "{{ item }}"
+      with_items: "{{ Instance }}"
+
+    - name: get metadata of Instance
+      ec2_instance_facts:
+        instance_ids: "{{ item }}"
+      with_items: "{{ Instance }}"    
+      register: ec2_metadata
+
+    - name: Record Users Access Keys
+      debug: var=ec2_metadata.results[{{ item }}].instances[0].instance_id
+      with_sequence: start=0 end={{ec2_metadata.results|length -1}}
+      
